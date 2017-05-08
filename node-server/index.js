@@ -12,6 +12,11 @@ io.on('connection', skt => {
         console.log(d);
     });
 
+    skt.on('position-update', d => {
+        console.log(d);
+        io.emit('position-update', {id: skt.id, x: d.x, y: d.y});
+    });
+
     skt.on('latency', d => {
         skt.emit('latency');
         console.log('latency calc');
