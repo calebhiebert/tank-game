@@ -8,8 +8,8 @@ public class HexMotor : MonoBehaviour {
     public float force = 1;
 
 	// Use this for initialization
-	void Start () {
-		
+	void Awake () {
+        GetComponent<HexNetworkUpdater>().local = true;
 	}
 	
 	// Update is called once per frame

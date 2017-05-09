@@ -1,5 +1,5 @@
-unity-client/Library/
-unity-client/Temp/
+*/Library/*
+*/Temp/*
 /unity-client/[Oo]bj/
 /unity-client/[Bb]uild/
 /unity-client/[Bb]uilds/

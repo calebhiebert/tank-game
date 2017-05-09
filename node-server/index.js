@@ -8,19 +8,15 @@ let io = require('socket.io')(server);
 io.on('connection', skt => {
     console.log('connection ' + skt.id);
 
-    skt.on('test-event', d => {
-        console.log(d);
-    });
-
     skt.on('position-update', d => {
-        console.log(d);
-        io.emit('position-update', {id: skt.id, x: d.x, y: d.y});
+        //console.log(skt.id + ' ' + JSON.stringify(d));
+        io.emit('position-update', {id: skt.id, x: d.x, y: d.y, r: d.r});
     });
 
-    skt.on('latency', d => {
-        skt.emit('latency');
-        console.log('latency calc');
-    })
+    skt.on('disconnect', d => {
+        console.log('disconnect ' + skt.id);
+        io.emit('player-disconnect', {id: skt.id});
+    });
 });
 
 server.listen(PORT);

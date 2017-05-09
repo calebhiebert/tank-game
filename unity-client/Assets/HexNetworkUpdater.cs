@@ -5,29 +5,56 @@ using UnityEngine;
 
 public class HexNetworkUpdater : MonoBehaviour {
 
-    public SocketIOComponent socket;
+    public string id;
+    public bool local;
+    public int updatesPerSecond;
 
     private Vector2 lastFramePosition;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    private SocketIOComponent socket;
+    private Rigidbody2D rigidBody;
 
-        JSONObject pos = new JSONObject();
-        pos.AddField("x", transform.position.x);
-        pos.AddField("y", transform.position.y);
+    private float lastUpdate;
 
-        if(((Vector2)transform.position) != lastFramePosition)
+    private void Awake()
+    {
+        HexNetworkManager.players.Add(this);
+        rigidBody = GetComponent<Rigidbody2D>();
+    }
+
+    // Use this for initialization
+    void Start () {
+        socket = SocketIOComponent.Socket;
+
+        socket.On("open", d =>
         {
-            lastFramePosition = transform.position;
+            if (local)
+            {
+                id = socket.sid;
+            }
+        });
+	}
 
-            socket.Emit("position-update", pos);
+    // Update is called once per frame
+    void Update () {
 
-            Debug.Log(pos.ToString());
+        if (local && (Time.time - lastUpdate) > 1f / updatesPerSecond)
+        {
+            JSONObject pos = new JSONObject();
+            pos.AddField("x", transform.position.x);
+            pos.AddField("y", transform.position.y);
+            pos.AddField("r", transform.eulerAngles.z);
+            pos.AddField("av", rigidBody.angularVelocity);
+            pos.AddField("vx", rigidBody.velocity.x);
+            pos.AddField("vy", rigidBody.velocity.y);
+
+            if (((Vector2)transform.position) != lastFramePosition)
+            {
+                lastFramePosition = transform.position;
+
+                socket.Emit("position-update", pos);
+                lastUpdate = Time.time;
+            }
         }
 	}
 }
